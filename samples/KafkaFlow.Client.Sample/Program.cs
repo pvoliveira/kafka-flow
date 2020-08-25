@@ -13,7 +13,7 @@
             var memberId = Guid.NewGuid().ToString();
             const string groupId = "print-console-handler";
 
-            var connection = new KafkaHostConnection(
+            var connection = await KafkaHost.MakeHostAsync(
                 "localhost",
                 9092,
                 "test-client-id");
@@ -83,7 +83,7 @@
             await Task.Delay(5000);
         }
 
-        private static Task<FetchV11Response> FetchMessage(KafkaHostConnection connection)
+        private static Task<FetchV11Response> FetchMessage(KafkaHost connection)
         {
             return connection.SendAsync(
                 new FetchV11Request
@@ -125,7 +125,7 @@
                 TimeSpan.FromSeconds(30));
         }
 
-        private static Task<ProduceV8Response> ProduceMessage(KafkaHostConnection connection, long now)
+        private static Task<ProduceV8Response> ProduceMessage(KafkaHost connection, long now)
         {
             return connection.SendAsync(
                 new ProduceV8Request(

@@ -1,5 +1,7 @@
 namespace KafkaFlow.Client.Protocol
 {
+    using KafkaFlow.Client.Protocol.Messages;
+
     public interface IRequestMessage<TResponse> : IRequestMessage where TResponse : IResponse
     {
     }

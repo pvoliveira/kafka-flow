@@ -1,5 +1,6 @@
 namespace KafkaFlow.Client.Protocol.Messages
 {
+    using System.Buffers;
     using System.IO;
 
     public class TopicMetadataV9Response : IResponseV2
@@ -12,15 +13,15 @@ namespace KafkaFlow.Client.Protocol.Messages
         public int ClusterAuthorizedOperations { get; private set; }
         public TaggedField[] TaggedFields { get; private set; }
 
-        public void Read(Stream source)
+        public void Read(ref SequenceReader<byte> source)
         {
-            this.ThrottleTime = source.ReadInt32();
-            this.Brokers = source.ReadCompactArray<Broker>();
-            this.ClusterId = source.ReadCompactNullableString();
-            this.ControllerId = source.ReadInt32();
-            this.Topics = source.ReadCompactArray<Topic>();
-            this.ClusterAuthorizedOperations = source.ReadInt32();
-            this.TaggedFields = source.ReadTaggedFields();
+            this.ThrottleTime = BufferExtensions.ReadInt32(ref source);
+            this.Brokers = BufferExtensions.ReadCompactArray<Broker>(ref source);
+            this.ClusterId = BufferExtensions.ReadCompactNullableString(ref source);
+            this.ControllerId = BufferExtensions.ReadInt32(ref source);
+            this.Topics = BufferExtensions.ReadCompactArray<Topic>(ref source);
+            this.ClusterAuthorizedOperations = BufferExtensions.ReadInt32(ref source);
+            this.TaggedFields = BufferExtensions.ReadTaggedFields(ref source);
         }
 
         public class Topic : IResponseV2
@@ -32,14 +33,14 @@ namespace KafkaFlow.Client.Protocol.Messages
             public int TopicAuthorizedOperations { get; set; }
             public TaggedField[] TaggedFields { get; private set; }
 
-            public void Read(Stream source)
+            public void Read(ref SequenceReader<byte> source)
             {
-                this.Error = source.ReadErrorCode();
-                this.Name = source.ReadCompactString();
-                this.IsInternal = source.ReadBoolean();
-                this.Partitions = source.ReadCompactArray<Partition>();
-                this.TopicAuthorizedOperations = source.ReadInt32();
-                this.TaggedFields = source.ReadTaggedFields();
+                this.Error = BufferExtensions.ReadErrorCode(ref source);
+                this.Name = BufferExtensions.ReadCompactString(ref source);
+                this.IsInternal = BufferExtensions.ReadBoolean(ref source);
+                this.Partitions = BufferExtensions.ReadCompactArray<Partition>(ref source);
+                this.TopicAuthorizedOperations = BufferExtensions.ReadInt32(ref source);
+                this.TaggedFields = BufferExtensions.ReadTaggedFields(ref source);
             }
         }
 
@@ -54,16 +55,16 @@ namespace KafkaFlow.Client.Protocol.Messages
             public int[] OfflineReplicas { get; private set; }
             public TaggedField[] TaggedFields { get; private set; }
 
-            public void Read(Stream source)
+            public void Read(ref SequenceReader<byte> source)
             {
-                this.Error = source.ReadErrorCode();
-                this.Id = source.ReadInt32();
-                this.LeaderId = source.ReadInt32();
-                this.LeaderEpoch = source.ReadInt32();
-                this.ReplicaNodes = source.ReadCompactInt32Array();
-                this.IsrNodes = source.ReadCompactInt32Array();
-                this.OfflineReplicas = source.ReadCompactInt32Array();
-                this.TaggedFields = source.ReadTaggedFields();
+                this.Error = BufferExtensions.ReadErrorCode(ref source);
+                this.Id = BufferExtensions.ReadInt32(ref source);
+                this.LeaderId = BufferExtensions.ReadInt32(ref source);
+                this.LeaderEpoch = BufferExtensions.ReadInt32(ref source);
+                this.ReplicaNodes = BufferExtensions.ReadCompactInt32Array(ref source);
+                this.IsrNodes = BufferExtensions.ReadCompactInt32Array(ref source);
+                this.OfflineReplicas = BufferExtensions.ReadCompactInt32Array(ref source);
+                this.TaggedFields = BufferExtensions.ReadTaggedFields(ref source);
             }
         }
 
@@ -75,13 +76,13 @@ namespace KafkaFlow.Client.Protocol.Messages
             public string? Rack { get; private set; }
             public TaggedField[] TaggedFields { get; private set; }
 
-            public void Read(Stream source)
+            public void Read(ref SequenceReader<byte> source)
             {
-                this.NodeId = source.ReadInt32();
-                this.Host = source.ReadCompactString();
-                this.Port = source.ReadInt32();
-                this.Rack = source.ReadCompactNullableString();
-                this.TaggedFields = source.ReadTaggedFields();
+                this.NodeId = BufferExtensions.ReadInt32(ref source);
+                this.Host = BufferExtensions.ReadCompactString(ref source);
+                this.Port = BufferExtensions.ReadInt32(ref source);
+                this.Rack = BufferExtensions.ReadCompactNullableString(ref source);
+                this.TaggedFields = BufferExtensions.ReadTaggedFields(ref source);
             }
         }
     }

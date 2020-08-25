@@ -10,6 +10,8 @@ namespace KafkaFlow.Client.Protocol.Messages
 
         public void Write(Stream destination)
         {
+            destination.WriteInt16((short)ApiKey);
+            destination.WriteInt16(ApiVersion);
         }
     }
 }

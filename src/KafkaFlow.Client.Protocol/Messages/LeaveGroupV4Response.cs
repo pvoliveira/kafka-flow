@@ -1,5 +1,6 @@
 namespace KafkaFlow.Client.Protocol.Messages
 {
+    using System.Buffers;
     using System.IO;
 
     public class LeaveGroupV4Response : IResponseV2
@@ -10,12 +11,12 @@ namespace KafkaFlow.Client.Protocol.Messages
 
         public TaggedField[] TaggedFields { get; private set; }
 
-        public void Read(Stream source)
+        public void Read(ref SequenceReader<byte> source)
         {
-            this.ThrottleTimeMs = source.ReadInt32();
-            this.Error = (ErrorCode) source.ReadInt16();
-            this.Members = source.ReadCompactArray<Member>();
-            this.TaggedFields = source.ReadTaggedFields();
+            this.ThrottleTimeMs = BufferExtensions.ReadInt32(ref source);
+            this.Error = (ErrorCode) BufferExtensions.ReadInt16(ref source);
+            this.Members = BufferExtensions.ReadCompactArray<Member>(ref source);
+            this.TaggedFields = BufferExtensions.ReadTaggedFields(ref source);
         }
 
         public class Member : IResponseV2
@@ -28,12 +29,12 @@ namespace KafkaFlow.Client.Protocol.Messages
 
             public TaggedField[] TaggedFields { get; private set; }
 
-            public void Read(Stream source)
+            public void Read(ref SequenceReader<byte> source)
             {
-                this.MemberId = source.ReadCompactString();
-                this.GroupInstanceId = source.ReadCompactString();
-                this.Error = (ErrorCode) source.ReadInt16();
-                this.TaggedFields = source.ReadTaggedFields();
+                this.MemberId = BufferExtensions.ReadCompactString(ref source);
+                this.GroupInstanceId = BufferExtensions.ReadCompactString(ref source);
+                this.Error = (ErrorCode) BufferExtensions.ReadInt16(ref source);
+                this.TaggedFields = BufferExtensions.ReadTaggedFields(ref source);
             }
         }
     }

@@ -1,5 +1,6 @@
 namespace KafkaFlow.Client.Protocol.Messages
 {
+    using System.Buffers;
     using System.IO;
 
     public class JoinGroupV7Response : IResponseV2
@@ -22,17 +23,17 @@ namespace KafkaFlow.Client.Protocol.Messages
 
         public TaggedField[] TaggedFields { get; private set; }
 
-        public void Read(Stream source)
+        public void Read(ref SequenceReader<byte> source)
         {
-            this.ThrottleTimeMs = source.ReadInt32();
-            this.Error = (ErrorCode) source.ReadInt16();
-            this.GenerationId = source.ReadInt32();
-            this.ProtocolType = source.ReadCompactNullableString();
-            this.ProtocolName = source.ReadCompactNullableString();
-            this.LeaderId = source.ReadCompactString();
-            this.MemberId = source.ReadCompactString();
-            this.Members = source.ReadCompactArray<Member>();
-            this.TaggedFields = source.ReadTaggedFields();
+            this.ThrottleTimeMs = BufferExtensions.ReadInt32(ref source);
+            this.Error = (ErrorCode) BufferExtensions.ReadInt16(ref source);
+            this.GenerationId = BufferExtensions.ReadInt32(ref source);
+            this.ProtocolType = BufferExtensions.ReadCompactNullableString(ref source);
+            this.ProtocolName = BufferExtensions.ReadCompactNullableString(ref source);
+            this.LeaderId = BufferExtensions.ReadCompactString(ref source);
+            this.MemberId = BufferExtensions.ReadCompactString(ref source);
+            this.Members = BufferExtensions.ReadCompactArray<Member>(ref source);
+            this.TaggedFields = BufferExtensions.ReadTaggedFields(ref source);
         }
 
         public class Member : IResponseV2
@@ -45,12 +46,12 @@ namespace KafkaFlow.Client.Protocol.Messages
 
             public TaggedField[] TaggedFields { get; private set; }
 
-            public void Read(Stream source)
+            public void Read(ref SequenceReader<byte> source)
             {
-                this.MemberId = source.ReadCompactString();
-                this.GroupInstanceId = source.ReadCompactNullableString();
-                this.Metadata = source.ReadCompactByteArray();
-                this.TaggedFields = source.ReadTaggedFields();
+                this.MemberId = BufferExtensions.ReadCompactString(ref source);
+                this.GroupInstanceId = BufferExtensions.ReadCompactNullableString(ref source);
+                this.Metadata = BufferExtensions.ReadCompactByteArray(ref source);
+                this.TaggedFields = BufferExtensions.ReadTaggedFields(ref source);
             }
         }
     }

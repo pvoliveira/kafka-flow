@@ -1,5 +1,6 @@
 namespace KafkaFlow.Client.Protocol.Messages
 {
+    using System.Buffers;
     using System.IO;
 
     public class FetchV11Response : IResponse
@@ -12,12 +13,12 @@ namespace KafkaFlow.Client.Protocol.Messages
 
         public Topic[] Topics { get; set; }
 
-        public void Read(Stream source)
+        public void Read(ref SequenceReader<byte> source)
         {
-            this.ThrottleTimeMs = source.ReadInt32();
-            this.Error = source.ReadErrorCode();
-            this.SessionId = source.ReadInt32();
-            this.Topics = source.ReadArray<Topic>();
+            this.ThrottleTimeMs = BufferExtensions.ReadInt32(ref source);
+            this.Error = BufferExtensions.ReadErrorCode(ref source);
+            this.SessionId = BufferExtensions.ReadInt32(ref source);
+            this.Topics = BufferExtensions.ReadArray<Topic>(ref source);
         }
 
         public class Topic : IResponse
@@ -26,10 +27,10 @@ namespace KafkaFlow.Client.Protocol.Messages
 
             public Partition[] Partitions { get; set; }
 
-            public void Read(Stream source)
+            public void Read(ref SequenceReader<byte> source)
             {
-                this.Name = source.ReadString();
-                this.Partitions = source.ReadArray<Partition>();
+                this.Name = BufferExtensions.ReadString(ref source);
+                this.Partitions = BufferExtensions.ReadArray<Partition>(ref source);
             }
         }
 
@@ -39,10 +40,10 @@ namespace KafkaFlow.Client.Protocol.Messages
 
             public RecordBatch RecordBatch { get; set; }
 
-            public void Read(Stream source)
+            public void Read(ref SequenceReader<byte> source)
             {
-                this.Header = source.ReadMessage<PartitionHeader>();
-                this.RecordBatch = source.ReadMessage<RecordBatch>();
+                this.Header = BufferExtensions.ReadMessage<PartitionHeader>(ref source);
+                this.RecordBatch = BufferExtensions.ReadMessage<RecordBatch>(ref source);
             }
         }
 
@@ -62,15 +63,15 @@ namespace KafkaFlow.Client.Protocol.Messages
 
             public int PreferredReadReplica { get; set; }
 
-            public void Read(Stream source)
+            public void Read(ref SequenceReader<byte> source)
             {
-                this.Id = source.ReadInt32();
-                this.Error = source.ReadErrorCode();
-                this.HighWatermark = source.ReadInt64();
-                this.LastStableOffset = source.ReadInt64();
-                this.LogStartOffset = source.ReadInt64();
-                this.AbortedTransactions = source.ReadArray<AbortedTransaction>();
-                this.PreferredReadReplica = source.ReadInt32();
+                this.Id = BufferExtensions.ReadInt32(ref source);
+                this.Error = BufferExtensions.ReadErrorCode(ref source);
+                this.HighWatermark = BufferExtensions.ReadInt64(ref source);
+                this.LastStableOffset = BufferExtensions.ReadInt64(ref source);
+                this.LogStartOffset = BufferExtensions.ReadInt64(ref source);
+                this.AbortedTransactions = BufferExtensions.ReadArray<AbortedTransaction>(ref source);
+                this.PreferredReadReplica = BufferExtensions.ReadInt32(ref source);
             }
         }
 
@@ -80,10 +81,10 @@ namespace KafkaFlow.Client.Protocol.Messages
 
             public long FirstOffset { get; set; }
 
-            public void Read(Stream source)
+            public void Read(ref SequenceReader<byte> source)
             {
-                this.ProducerId = source.ReadInt64();
-                this.FirstOffset = source.ReadInt64();
+                this.ProducerId = BufferExtensions.ReadInt64(ref source);
+                this.FirstOffset = BufferExtensions.ReadInt64(ref source);
             }
         }
     }

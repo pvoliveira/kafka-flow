@@ -1,6 +1,7 @@
 namespace KafkaFlow.Client.Protocol.Messages
 {
     using System;
+    using System.Buffers;
     using System.IO;
 
     public class SyncGroupV5Request : IRequestMessageV2<SyncGroupV5Response>

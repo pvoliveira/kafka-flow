@@ -1,14 +1,14 @@
 namespace KafkaFlow.Client.Protocol.Messages
 {
-    using System.IO;
+    using System.Buffers;
 
     public class OffsetCommitV2Response : IResponse
     {
         public Topic[] Topics { get; private set; }
 
-        public void Read(Stream source)
+        public void Read(ref SequenceReader<byte> source)
         {
-            this.Topics = source.ReadArray<Topic>();
+            this.Topics = BufferExtensions.ReadArray<Topic>(ref source);
         }
 
         public class Topic : IResponse
@@ -17,10 +17,10 @@ namespace KafkaFlow.Client.Protocol.Messages
 
             public Partition[] Partitions { get; private set; }
 
-            public void Read(Stream source)
+            public void Read(ref SequenceReader<byte> source)
             {
-                this.Name = source.ReadString();
-                this.Partitions = source.ReadArray<Partition>();
+                this.Name = BufferExtensions.ReadString(ref source);
+                this.Partitions = BufferExtensions.ReadArray<Partition>(ref source);
             }
         }
 
@@ -30,10 +30,10 @@ namespace KafkaFlow.Client.Protocol.Messages
 
             public ErrorCode Error { get; private set; }
 
-            public void Read(Stream source)
+            public void Read(ref SequenceReader<byte> source)
             {
-                this.Id = source.ReadInt32();
-                this.Error = source.ReadErrorCode();
+                this.Id = BufferExtensions.ReadInt32(ref source);
+                this.Error = BufferExtensions.ReadErrorCode(ref source);
             }
         }
     }

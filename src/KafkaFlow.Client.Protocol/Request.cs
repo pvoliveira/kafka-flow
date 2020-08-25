@@ -1,6 +1,7 @@
 namespace KafkaFlow.Client.Protocol
 {
     using System;
+    using System.Buffers;
     using System.IO;
     using KafkaFlow.Client.Protocol.Messages;
 

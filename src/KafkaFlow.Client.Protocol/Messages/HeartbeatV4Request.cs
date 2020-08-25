@@ -1,6 +1,7 @@
 namespace KafkaFlow.Client.Protocol.Messages
 {
     using System;
+    using System.Buffers;
     using System.IO;
 
     public class HeartbeatV4Request : IRequestMessageV2<HeartbeatV4Response>

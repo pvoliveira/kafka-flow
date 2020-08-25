@@ -1,6 +1,7 @@
-namespace KafkaFlow.Client.Protocol.Messages
+namespace KafkaFlow.Client.Protocol
 {
     using System;
+    using System.Buffers;
     using System.IO;
     using System.Runtime.CompilerServices;
     using System.Text;
@@ -54,31 +55,29 @@ namespace KafkaFlow.Client.Protocol.Messages
             destination.WriteInt32(this.PartitionLeaderEpoch);
             destination.WriteByte(this.Magic);
             destination.WriteInt32(this.Crc);
-            crcSlice.WriteTo(destination);
+            destination.Write(crcSlice.GetBuffer());
         }
 
-        public void Read(Stream source)
+        public void Read(ref SequenceReader<byte> source)
         {
-            var size = source.ReadInt32();
+            var size = BufferExtensions.ReadInt32(ref source);
 
             if (size == 0)
                 return;
 
-            using var tracked = new TrackedStream(source, size);
-            this.BaseOffset = tracked.ReadInt64();
-            this.BatchLength = tracked.ReadInt32();
-            this.PartitionLeaderEpoch = tracked.ReadInt32();
-            this.Magic = (byte) tracked.ReadByte();
-            this.Crc = tracked.ReadInt32();
-            this.Attributes = tracked.ReadInt16();
-            this.LastOffsetDelta = tracked.ReadInt32();
-            this.FirstTimestamp = tracked.ReadInt64();
-            this.MaxTimestamp = tracked.ReadInt64();
-            this.ProducerId = tracked.ReadInt64();
-            this.ProducerEpoch = tracked.ReadInt16();
-            this.BaseSequence = tracked.ReadInt32();
-            this.Records = tracked.ReadArray<Record>();
-            tracked.DiscardRemainingData();
+            this.BaseOffset = BufferExtensions.ReadInt64(ref source);
+            this.BatchLength = BufferExtensions.ReadInt32(ref source);
+            this.PartitionLeaderEpoch = BufferExtensions.ReadInt32(ref source);
+            this.Magic = (byte)BufferExtensions.ReadByte(ref source);
+            this.Crc = BufferExtensions.ReadInt32(ref source);
+            this.Attributes = BufferExtensions.ReadInt16(ref source);
+            this.LastOffsetDelta = BufferExtensions.ReadInt32(ref source);
+            this.FirstTimestamp = BufferExtensions.ReadInt64(ref source);
+            this.MaxTimestamp = BufferExtensions.ReadInt64(ref source);
+            this.ProducerId = BufferExtensions.ReadInt64(ref source);
+            this.ProducerEpoch = BufferExtensions.ReadInt16(ref source);
+            this.BaseSequence = BufferExtensions.ReadInt32(ref source);
+            this.Records = BufferExtensions.ReadArray<Record>(ref source);
 
             // The code below calculates the CRC32c
             // var size = source.ReadInt32();
@@ -188,15 +187,15 @@ namespace KafkaFlow.Client.Protocol.Messages
                 tmp.CopyTo(destination);
             }
 
-            public void Read(Stream source)
+            public void Read(ref SequenceReader<byte> source)
             {
-                this.Length = source.ReadVarint();
-                this.Attributes = (byte) source.ReadByte();
-                this.TimestampDelta = source.ReadVarint();
-                this.OffsetDelta = source.ReadVarint();
-                this.Key = source.ReadBytes(source.ReadVarint());
-                this.Value = source.ReadBytes(source.ReadVarint());
-                this.Headers = source.ReadArray<Header>(source.ReadVarint());
+                this.Length = BufferExtensions.ReadVarint(ref source);
+                this.Attributes = (byte) BufferExtensions.ReadByte(ref source);
+                this.TimestampDelta = BufferExtensions.ReadVarint(ref source);
+                this.OffsetDelta = BufferExtensions.ReadVarint(ref source);
+                this.Key = BufferExtensions.ReadBytes(ref source, BufferExtensions.ReadVarint(ref source));
+                this.Value = BufferExtensions.ReadBytes(ref source, BufferExtensions.ReadVarint(ref source));
+                this.Headers = BufferExtensions.ReadArray<Header>(ref source, BufferExtensions.ReadVarint(ref source));
             }
         }
 
@@ -224,10 +223,10 @@ namespace KafkaFlow.Client.Protocol.Messages
                 }
             }
 
-            public void Read(Stream source)
+            public void Read(ref SequenceReader<byte> source)
             {
-                this.Key = source.ReadString(source.ReadVarint());
-                this.Value = source.ReadBytes(source.ReadVarint());
+                this.Key = BufferExtensions.ReadString(ref source, BufferExtensions.ReadVarint(ref source));
+                this.Value = BufferExtensions.ReadBytes(ref source, BufferExtensions.ReadVarint(ref source));
             }
         }
     }

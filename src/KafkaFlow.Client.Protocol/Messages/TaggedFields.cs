@@ -1,7 +1,9 @@
 namespace KafkaFlow.Client.Protocol.Messages
 {
     using System;
+    using System.Buffers;
     using System.IO;
+    using System.Runtime.CompilerServices;
 
     public class TaggedField : IRequest, IResponse
     {
@@ -16,10 +18,10 @@ namespace KafkaFlow.Client.Protocol.Messages
             destination.Write(this.Data);
         }
 
-        public void Read(Stream source)
+        public void Read(ref SequenceReader<byte> source)
         {
-            this.Tag = source.ReadUVarint();
-            this.Data = source.ReadBytes(source.ReadUVarint());
+            this.Tag = BufferExtensions.ReadUVarint(ref source);
+            this.Data = BufferExtensions.ReadBytes(ref source, BufferExtensions.ReadUVarint(ref source));
         }
     }
 }

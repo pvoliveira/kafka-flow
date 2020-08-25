@@ -1,5 +1,6 @@
 namespace KafkaFlow.Client.Protocol.Messages
 {
+    using System.Buffers;
     using System.IO;
 
     public class FindCoordinatorV3Response : IResponseV2
@@ -18,15 +19,15 @@ namespace KafkaFlow.Client.Protocol.Messages
 
         public TaggedField[] TaggedFields { get; private set; }
 
-        public void Read(Stream source)
+        public void Read(ref SequenceReader<byte> source)
         {
-            this.ThrottleTimeMs = source.ReadInt32();
-            this.Error = source.ReadErrorCode();
-            this.ErrorMessage = source.ReadCompactString();
-            this.NodeId = source.ReadInt32();
-            this.Host = source.ReadCompactString();
-            this.Port = source.ReadInt32();
-            this.TaggedFields = source.ReadTaggedFields();
+            this.ThrottleTimeMs = BufferExtensions.ReadInt32(ref source);
+            this.Error = BufferExtensions.ReadErrorCode(ref source);
+            this.ErrorMessage = BufferExtensions.ReadCompactString(ref source);
+            this.NodeId = BufferExtensions.ReadInt32(ref source);
+            this.Host = BufferExtensions.ReadCompactString(ref source);
+            this.Port = BufferExtensions.ReadInt32(ref source);
+            this.TaggedFields = BufferExtensions.ReadTaggedFields(ref source);
         }
     }
 }

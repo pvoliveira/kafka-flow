@@ -243,9 +243,11 @@ namespace KafkaFlow.Client.Protocol
         public static TMessage ReadMessage<TMessage>(this Stream source)
             where TMessage : class, IResponse, new()
         {
-            var message = new TMessage();
-            message.Read(source);
-            return message;
+            //var message = new TMessage();
+            //message.Read(source);
+            //return message;
+
+            throw new NotImplementedException();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -258,39 +260,41 @@ namespace KafkaFlow.Client.Protocol
 
         public static TMessage[] ReadArray<TMessage>(this Stream source, int count) where TMessage : class, IResponse, new()
         {
-            if (count < 0)
-                return null;
+            //if (count < 0)
+            //    return null;
 
-            if (count == 0)
-                return Array.Empty<TMessage>();
+            //if (count == 0)
+            //    return Array.Empty<TMessage>();
 
-            var result = new TMessage[count];
+            //var result = new TMessage[count];
 
-            for (var i = 0; i < count; i++)
-            {
-                result[i] = new TMessage();
-                result[i].Read(source);
-            }
+            //for (var i = 0; i < count; i++)
+            //{
+            //    result[i] = new TMessage();
+            //    result[i].Read(source);
+            //}
 
-            return result;
+            //return result;
+
+            throw new NotImplementedException();
         }
 
         public static TaggedField[] ReadTaggedFields(this Stream source)
         {
-            var count = source.ReadUVarint();
+            //var count = source.ReadUVarint();
 
-            if (count == 0)
-                return Array.Empty<TaggedField>();
+            //if (count == 0)
+            //    return Array.Empty<TaggedField>();
 
-            var result = new TaggedField[count];
+            //var result = new TaggedField[count];
 
-            for (var i = 0; i < count; i++)
-            {
-                result[i] = new TaggedField();
-                result[i].Read(source);
-            }
+            //for (var i = 0; i < count; i++)
+            //{
+            //    result[i] = new TaggedField();
+            //    result[i].Read(source);
+            //}
 
-            return result;
+            throw new NotImplementedException();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

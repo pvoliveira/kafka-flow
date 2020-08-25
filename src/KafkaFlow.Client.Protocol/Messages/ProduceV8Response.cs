@@ -1,6 +1,6 @@
 namespace KafkaFlow.Client.Protocol.Messages
 {
-    using System.IO;
+    using System.Buffers;
 
     public class ProduceV8Response : IResponse
     {
@@ -8,10 +8,10 @@ namespace KafkaFlow.Client.Protocol.Messages
 
         public int ThrottleTimeMs { get; set; }
 
-        public void Read(Stream source)
+        public void Read(ref SequenceReader<byte> source)
         {
-            this.Topics = source.ReadArray<Topic>();
-            this.ThrottleTimeMs = source.ReadInt32();
+            this.Topics = BufferExtensions.ReadArray<Topic>(ref source);
+            this.ThrottleTimeMs = BufferExtensions.ReadInt32(ref source);
         }
 
         public class Topic : IResponse
@@ -20,10 +20,10 @@ namespace KafkaFlow.Client.Protocol.Messages
 
             public Partition[] Partitions { get; set; }
 
-            public void Read(Stream source)
+            public void Read(ref SequenceReader<byte> source)
             {
-                this.Name = source.ReadString();
-                this.Partitions = source.ReadArray<Partition>();
+                this.Name = BufferExtensions.ReadString(ref source);
+                this.Partitions = BufferExtensions.ReadArray<Partition>(ref source);
             }
         }
 
@@ -43,15 +43,15 @@ namespace KafkaFlow.Client.Protocol.Messages
 
             public string? ErrorMessage { get; set; }
 
-            public void Read(Stream source)
+            public void Read(ref SequenceReader<byte> source)
             {
-                this.Id = source.ReadInt32();
-                this.Error = source.ReadErrorCode();
-                this.Offset = source.ReadInt64();
-                this.LogAppendTime = source.ReadInt64();
-                this.LogStartOffset = source.ReadInt64();
-                this.Errors = source.ReadArray<RecordError>();
-                this.ErrorMessage = source.ReadNullableString();
+                this.Id = BufferExtensions.ReadInt32(ref source);
+                this.Error = BufferExtensions.ReadErrorCode(ref source);
+                this.Offset = BufferExtensions.ReadInt64(ref source);
+                this.LogAppendTime = BufferExtensions.ReadInt64(ref source);
+                this.LogStartOffset = BufferExtensions.ReadInt64(ref source);
+                this.Errors = BufferExtensions.ReadArray<RecordError>(ref source);
+                this.ErrorMessage = BufferExtensions.ReadNullableString(ref source);
             }
         }
 
@@ -61,10 +61,10 @@ namespace KafkaFlow.Client.Protocol.Messages
 
             public string? Message { get; set; }
 
-            public void Read(Stream source)
+            public void Read(ref SequenceReader<byte> source)
             {
-                this.BatchIndex = source.ReadInt32();
-                this.Message = source.ReadNullableString();
+                this.BatchIndex = BufferExtensions.ReadInt32(ref source);
+                this.Message = BufferExtensions.ReadNullableString(ref source);
             }
         }
     }

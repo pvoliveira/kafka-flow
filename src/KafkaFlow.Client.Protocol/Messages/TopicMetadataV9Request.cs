@@ -1,6 +1,7 @@
 namespace KafkaFlow.Client.Protocol.Messages
 {
     using System;
+    using System.Buffers;
     using System.IO;
 
     public class TopicMetadataV9Request : IRequestMessageV2<TopicMetadataV9Response>

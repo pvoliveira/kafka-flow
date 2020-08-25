@@ -1,6 +1,7 @@
 namespace KafkaFlow.Client.Protocol.Messages
 {
     using System;
+    using System.Buffers;
     using System.IO;
 
     public class JoinGroupV7Request : IRequestMessageV2<JoinGroupV7Response>

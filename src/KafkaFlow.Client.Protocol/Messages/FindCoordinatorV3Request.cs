@@ -1,6 +1,7 @@
 namespace KafkaFlow.Client.Protocol.Messages
 {
     using System;
+    using System.Buffers;
     using System.IO;
 
     public class FindCoordinatorV3Request : IRequestMessageV2<FindCoordinatorV3Response>

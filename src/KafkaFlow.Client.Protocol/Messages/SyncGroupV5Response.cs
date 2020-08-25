@@ -1,5 +1,6 @@
 namespace KafkaFlow.Client.Protocol.Messages
 {
+    using System.Buffers;
     using System.IO;
 
     public class SyncGroupV5Response : IResponseV2
@@ -16,14 +17,14 @@ namespace KafkaFlow.Client.Protocol.Messages
 
         public TaggedField[] TaggedFields { get; private set; }
 
-        public void Read(Stream source)
+        public void Read(ref SequenceReader<byte> source)
         {
-            this.ThrottleTimeMs = source.ReadInt32();
-            this.Error = source.ReadErrorCode();
-            this.ProtocolType = source.ReadCompactNullableString();
-            this.ProtocolName = source.ReadCompactNullableString();
-            this.AssignmentMetadata = source.ReadCompactByteArray();
-            this.TaggedFields = source.ReadTaggedFields();
+            this.ThrottleTimeMs = BufferExtensions.ReadInt32(ref source);
+            this.Error = BufferExtensions.ReadErrorCode(ref source);
+            this.ProtocolType = BufferExtensions.ReadCompactNullableString(ref source);
+            this.ProtocolName = BufferExtensions.ReadCompactNullableString(ref source);
+            this.AssignmentMetadata = BufferExtensions.ReadCompactByteArray(ref source);
+            this.TaggedFields = BufferExtensions.ReadTaggedFields(ref source);
         }
     }
 }

@@ -1,6 +1,6 @@
 namespace KafkaFlow.Client.Protocol.Messages
 {
-    using System.IO;
+    using System.Buffers;
 
     public class OffsetFetchV5Response : IResponse
     {
@@ -10,11 +10,11 @@ namespace KafkaFlow.Client.Protocol.Messages
 
         public ErrorCode Error { get; set; }
 
-        public void Read(Stream source)
+        public void Read(ref SequenceReader<byte> source)
         {
-            this.ThrottleTimeMs = source.ReadInt32();
-            this.Topics = source.ReadArray<Topic>();
-            this.Error = source.ReadErrorCode();
+            this.ThrottleTimeMs = BufferExtensions.ReadInt32(ref source);
+            this.Topics = BufferExtensions.ReadArray<Topic>(ref source);
+            this.Error = BufferExtensions.ReadErrorCode(ref source);
         }
 
         public class Topic : IResponse
@@ -23,10 +23,10 @@ namespace KafkaFlow.Client.Protocol.Messages
 
             public Partition[] Partitions { get; set; }
 
-            public void Read(Stream source)
+            public void Read(ref SequenceReader<byte> source)
             {
-                this.Name = source.ReadString();
-                this.Partitions = source.ReadArray<Partition>();
+                this.Name = BufferExtensions.ReadString(ref source);
+                this.Partitions = BufferExtensions.ReadArray<Partition>(ref source);
             }
         }
 
@@ -42,13 +42,13 @@ namespace KafkaFlow.Client.Protocol.Messages
 
             public short ErrorCode { get; set; }
 
-            public void Read(Stream source)
+            public void Read(ref SequenceReader<byte> source)
             {
-                this.Id = source.ReadInt32();
-                this.CommittedOffset = source.ReadInt64();
-                this.CommittedLeaderEpoch = source.ReadInt32();
-                this.Metadata = source.ReadString();
-                this.ErrorCode = source.ReadInt16();
+                this.Id = BufferExtensions.ReadInt32(ref source);
+                this.CommittedOffset = BufferExtensions.ReadInt64(ref source);
+                this.CommittedLeaderEpoch = BufferExtensions.ReadInt32(ref source);
+                this.Metadata = BufferExtensions.ReadString(ref source);
+                this.ErrorCode = BufferExtensions.ReadInt16(ref source);
             }
         }
     }
